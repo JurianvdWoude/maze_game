@@ -4,16 +4,31 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public class MazeUnit
+{
+    public Vector3 mazePosition { get; set; }
+    public bool traversed { get; set; }
+    public GameObject mazeUnitGameObject { get; set; }
+    public MazeUnit(Vector3 mazePosition, bool traversed, GameObject mazeUnitGameObject)
+    {
+        this.mazePosition = mazePosition;
+        this.traversed = traversed;
+        this.mazeUnitGameObject = mazeUnitGameObject;
+    }
+}
+
 public class Maze : MonoBehaviour
 {
     [SerializeField]
-    private List<GameObject> _maze;
+    private List<MazeUnit> _maze = new List<MazeUnit>();
     [SerializeField]
-    private GameObject _mazeUnit;
+    private GameObject _mazeUnitGameObject;
     // Start is called before the first frame update
     void Start()
     {
-        _maze.Add(Instantiate(_mazeUnit, new Vector3(0, 0, 0), Quaternion.identity));
+        GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
+        MazeUnit mazeUnit = new MazeUnit(new Vector3(0,0,0), false, _mazeUnitGameObject);
+        _maze.Add(mazeUnit);
         // Transform childToRemove = _maze[0].transform.Find("LeftWall");
         // childToRemove.parent = null;
         // Destroy(childToRemove.gameObject);
@@ -22,52 +37,92 @@ public class Maze : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameObject lastMazeUnit = _maze.LastOrDefault<GameObject>();
-        int lastMazeUnitIndex = _maze.LastIndexOf(lastMazeUnit);
-        Vector3 lastMazeUnitPosition = lastMazeUnit.transform.position;
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        MazeUnit lastMazeUnit = _maze.LastOrDefault();
+        if (lastMazeUnit != null)
         {
-            Transform lastMazeUnitChildToRemove = lastMazeUnit.transform.Find("LeftWall");
-            lastMazeUnitChildToRemove.parent = null;
-            Destroy(lastMazeUnitChildToRemove.gameObject);
-            GameObject newMazeUnit = Instantiate(_mazeUnit, lastMazeUnitPosition + new Vector3(-1, 0, 0), Quaternion.identity);
-            Transform newMazeUnitChildToRemove = newMazeUnit.transform.Find("RightWall");
-            newMazeUnitChildToRemove.parent = null;
-            Destroy(newMazeUnitChildToRemove.gameObject);
-            _maze.Add(newMazeUnit);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            int lastMazeUnitIndex = _maze.LastIndexOf(lastMazeUnit);
+            Vector3 lastMazeUnitPosition = lastMazeUnit.mazeUnitGameObject.transform.position;
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                Transform lastMazeUnitTransformChildToRemove = lastMazeUnit.mazeUnitGameObject.transform.Find("LeftWall");
+                if (lastMazeUnitTransformChildToRemove != null)
+                {
+                    lastMazeUnitTransformChildToRemove.parent = null;
+                    Destroy(lastMazeUnitTransformChildToRemove.gameObject);
+                    GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + new Vector3(-1, 0, 0), Quaternion.identity);
+                    if (newMazeUnitGameObject != null)
+                    {
+                        Transform newMazeUnitGameObjectChildToRemove = newMazeUnitGameObject.transform.Find("RightWall");
+                        newMazeUnitGameObjectChildToRemove.parent = null;
+                        Destroy(newMazeUnitGameObjectChildToRemove.gameObject);
+                        MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position, false, newMazeUnitGameObject);
+                        _maze.Add(newMazeUnit);
+                    } else
+                    {
+                        Debug.Log("Could not instantiate newGameObject");
+                    }
+                } else
+                {
+                    Debug.Log("LeftWall doesn't exist");
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                Transform lastMazeUnitTransformChildToRemove = lastMazeUnit.mazeUnitGameObject.transform.Find("TopWall");
+                if (lastMazeUnitTransformChildToRemove != null)
+                {
+                    lastMazeUnitTransformChildToRemove.parent = null;
+                    Destroy(lastMazeUnitTransformChildToRemove.gameObject);
+                    GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + new Vector3(0, 1, 0), Quaternion.identity);
+                    if (newMazeUnitGameObject != null)
+                    {
+                        Transform newMazeUnitGameObjectChildToRemove = newMazeUnitGameObject.transform.Find("BottomWall");
+                        newMazeUnitGameObjectChildToRemove.parent = null;
+                        Destroy(newMazeUnitGameObjectChildToRemove.gameObject);
+                        MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position, false, newMazeUnitGameObject);
+                        _maze.Add(newMazeUnit);
+                    }
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                Transform lastMazeUnitTransformChildToRemove = lastMazeUnit.mazeUnitGameObject.transform.Find("RightWall");
+                if (lastMazeUnitTransformChildToRemove != null)
+                {
+                    lastMazeUnitTransformChildToRemove.parent = null;
+                    Destroy(lastMazeUnitTransformChildToRemove.gameObject);
+                    GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + new Vector3(1, 0, 0), Quaternion.identity);
+                    if (newMazeUnitGameObject != null)
+                    {
+                        Transform newMazeUnitGameObjectChildToRemove = newMazeUnitGameObject.transform.Find("LeftWall");
+                        newMazeUnitGameObjectChildToRemove.parent = null;
+                        Destroy(newMazeUnitGameObjectChildToRemove.gameObject);
+                        MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position, false, newMazeUnitGameObject);
+                        _maze.Add(newMazeUnit);
+                    }
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                Transform lastMazeUnitTransformChildToRemove = lastMazeUnit.mazeUnitGameObject.transform.Find("BottomWall");
+                if (lastMazeUnitTransformChildToRemove != null)
+                {
+                    lastMazeUnitTransformChildToRemove.parent = null;
+                    Destroy(lastMazeUnitTransformChildToRemove.gameObject);
+                    GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + new Vector3(0, -1, 0), Quaternion.identity);
+                    if (newMazeUnitGameObject != null)
+                    {
+                        Transform newMazeUnitGameObjectChildToRemove = newMazeUnitGameObject.transform.Find("TopWall");
+                        newMazeUnitGameObjectChildToRemove.parent = null;
+                        Destroy(newMazeUnitGameObjectChildToRemove.gameObject);
+                        MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position, false, newMazeUnitGameObject);
+                        _maze.Add(newMazeUnit);
+                    }
+                }
+            }
+        } else
         {
-            Transform lastMazeUnitChildToRemove = lastMazeUnit.transform.Find("TopWall");
-            lastMazeUnitChildToRemove.parent = null;
-            Destroy(lastMazeUnitChildToRemove.gameObject);
-            GameObject newMazeUnit = Instantiate(_mazeUnit, lastMazeUnitPosition + new Vector3(0, 1, 0), Quaternion.identity);
-            Transform newMazeUnitChildToRemove = newMazeUnit.transform.Find("BottomWall");
-            newMazeUnitChildToRemove.parent = null;
-            Destroy(newMazeUnitChildToRemove.gameObject);
-            _maze.Add(newMazeUnit);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-        {
-            Transform lastMazeUnitChildToRemove = lastMazeUnit.transform.Find("RightWall");
-            lastMazeUnitChildToRemove.parent = null;
-            Destroy(lastMazeUnitChildToRemove.gameObject);
-            GameObject newMazeUnit = Instantiate(_mazeUnit, lastMazeUnitPosition + new Vector3(1, 0, 0), Quaternion.identity);
-            Transform newMazeUnitChildToRemove = newMazeUnit.transform.Find("LeftWall");
-            newMazeUnitChildToRemove.parent = null;
-            Destroy(newMazeUnitChildToRemove.gameObject);
-            _maze.Add(newMazeUnit);
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-        {
-            Transform lastMazeUnitChildToRemove = lastMazeUnit.transform.Find("BottomWall");
-            lastMazeUnitChildToRemove.parent = null;
-            Destroy(lastMazeUnitChildToRemove.gameObject);
-            GameObject newMazeUnit = Instantiate(_mazeUnit, lastMazeUnitPosition + new Vector3(0, -1, 0), Quaternion.identity);
-            Transform newMazeUnitChildToRemove = newMazeUnit.transform.Find("TopWall");
-            newMazeUnitChildToRemove.parent = null;
-            Destroy(newMazeUnitChildToRemove.gameObject);
-            _maze.Add(newMazeUnit);
+            Debug.Log("Maze list is empty");
         }
     }
 }

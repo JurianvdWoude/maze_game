@@ -330,8 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cda37ca55aaa2a849896f7603874eff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maze: []
-  _mazeUnit: {fileID: 5925193286811070721, guid: fc66d202922bdd5489c0f216e30f7314, type: 3}
+  _mazeUnitGameObject: {fileID: 5925193286811070721, guid: fc66d202922bdd5489c0f216e30f7314, type: 3}
 --- !u!4 &1682926446
 Transform:
   m_ObjectHideFlags: 0

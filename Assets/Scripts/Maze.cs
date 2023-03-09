@@ -28,36 +28,52 @@ public class Maze : MonoBehaviour
     private List<MazeUnit> _maze = new List<MazeUnit>();
     [SerializeField]
     private GameObject _mazeUnitGameObject;
+    [SerializeField]
+    private GameObject _mainCamera;
+    [SerializeField]
+    private float _mazeWidth = 10;
+    [SerializeField]
+    private float _mazeHeight = 10;
+    [SerializeField]
+    private int _mazeUnitHeight = 1;
+    [SerializeField]
+    private int _mazeUnitWidth = 1;
+    [SerializeField]
+    private int _startingXCoordinate = 0;
+    [SerializeField]
+    private int _startingYCoordinate = 0;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        // temporarily add the maze values here
+        _mazeWidth = 100;
+        _mazeHeight = 100;
+        _mazeUnitHeight = 5;
+        _mazeUnitWidth = 5;
+
+        // adjust the camera
+        float largestWidthOrHeight = _mazeWidth > _mazeHeight ? _mazeWidth : _mazeHeight;
+        _mainCamera.transform.position = new Vector3(_mazeWidth / 2, _mazeHeight / 2, -1 * largestWidthOrHeight - 5);
+
+        _mazeUnitGameObject.transform.localScale = new Vector3(_mazeUnitWidth, _mazeUnitHeight, 1);
         GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
         MazeUnit mazeUnit = new MazeUnit(new Vector3(0,0,0), false, mazeUnitGameObject);
         _maze.Add(mazeUnit);
 
         
+
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        // for 16:9
-        // check if y >= 4 => can't go up
-        // check if y <= -3 => can't go down
-        // check if x <= -9 ==> can't go left
-        // check if x >= 9 ==> can't go right
-        // check if a neighbor exists ==> can't go there 
-        // otherwise: pick a random direction and grow
 
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {
-
-            // Array positionValues = Enum.GetValues(typeof(Position));
-            
-
-
             Vector3 lastMazeUnitPosition = lastMazeUnit.mazePosition;
 
             List<Direction> positionValues = _CheckIfBordering(lastMazeUnitPosition);
@@ -79,24 +95,33 @@ public class Maze : MonoBehaviour
     {
         List<Direction> positionValues = new List<Direction>();
 
-        bool hasNeighborLeft = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1, 0, 0)));
-        bool hasNeighborRight = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(1, 0, 0)));
-        bool hasNeighborUp = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, 1, 0)));
-        bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, -1, 0)));
+        bool hasNeighborLeft = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1 * _mazeUnitWidth, 0, 0)));
+        bool hasNeighborRight = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(_mazeUnitWidth, 0, 0)));
+        bool hasNeighborUp = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, _mazeUnitHeight, 0)));
+        bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, -1 * _mazeUnitHeight, 0)));
 
-        if (lastMazeUnitPosition.x < 9 && !hasNeighborRight)
+        if (_mazeHeight < 5)
+        {
+            _mazeHeight = 5;
+        }
+        if (_mazeWidth < 5)
+        {
+            _mazeWidth = 5;
+        }
+
+        if (lastMazeUnitPosition.x < _mazeWidth && !hasNeighborRight)
         {
             positionValues.Add(Direction.right);
         }
-        if (lastMazeUnitPosition.x > -9 && !hasNeighborLeft)
+        if (lastMazeUnitPosition.x > 0 && !hasNeighborLeft)
         {
             positionValues.Add(Direction.left);
         }
-        if (lastMazeUnitPosition.y < 4 && !hasNeighborUp)
+        if (lastMazeUnitPosition.y < _mazeHeight && !hasNeighborUp)
         {
             positionValues.Add(Direction.up);
         }
-        if (lastMazeUnitPosition.y > -3 && !hasNeighborDown)
+        if (lastMazeUnitPosition.y > 0 && !hasNeighborDown)
         {
             positionValues.Add(Direction.down);
         }
@@ -128,22 +153,22 @@ public class Maze : MonoBehaviour
             switch (direction)
             {
                 case Direction.up:
-                    directionToMoveTo = new Vector3(0, 1, 0);
+                    directionToMoveTo = new Vector3(0, _mazeUnitHeight, 0);
                     oldMazeUnitWallName = "TopWall";
                     newMazeUnitWallName = "BottomWall";
                     break;
                 case Direction.down:
-                    directionToMoveTo = new Vector3(0, -1, 0);
+                    directionToMoveTo = new Vector3(0, -1 * _mazeUnitHeight, 0);
                     oldMazeUnitWallName = "BottomWall";
                     newMazeUnitWallName = "TopWall";
                     break;
                 case Direction.left:
-                    directionToMoveTo = new Vector3(-1, 0, 0);
+                    directionToMoveTo = new Vector3(-1 * _mazeUnitWidth, 0, 0);
                     oldMazeUnitWallName = "LeftWall";
                     newMazeUnitWallName = "RightWall";
                     break;
                 case Direction.right:
-                    directionToMoveTo = new Vector3(1, 0, 0);
+                    directionToMoveTo = new Vector3(_mazeUnitWidth, 0, 0);
                     oldMazeUnitWallName = "RightWall";
                     newMazeUnitWallName = "LeftWall";
                     break;

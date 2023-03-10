@@ -31,13 +31,13 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private GameObject _mainCamera;
     [SerializeField]
-    private float _mazeWidth = 10;
+    private float _mazeWidth;
     [SerializeField]
-    private float _mazeHeight = 10;
+    private float _mazeHeight;
     [SerializeField]
-    private int _mazeUnitHeight = 1;
+    private float _mazeUnitHeight;
     [SerializeField]
-    private int _mazeUnitWidth = 1;
+    private float _mazeUnitWidth;
     [SerializeField]
     private int _startingXCoordinate = 0;
     [SerializeField]
@@ -47,10 +47,10 @@ public class Maze : MonoBehaviour
     void Start()
     {
         // temporarily add the maze values here
-        _mazeWidth = 100;
-        _mazeHeight = 100;
-        _mazeUnitHeight = 5;
-        _mazeUnitWidth = 5;
+        _mazeWidth = GameManager.mazeSize;
+        _mazeHeight = GameManager.mazeSize;
+        _mazeUnitHeight = GameManager.mazeUnitSize;
+        _mazeUnitWidth = GameManager.mazeUnitSize;
 
         // adjust the camera
         float largestWidthOrHeight = _mazeWidth > _mazeHeight ? _mazeWidth : _mazeHeight;
@@ -60,17 +60,11 @@ public class Maze : MonoBehaviour
         GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
         MazeUnit mazeUnit = new MazeUnit(new Vector3(0,0,0), false, mazeUnitGameObject);
         _maze.Add(mazeUnit);
-
-        
-
-
-
     }
 
     // Update is called once per frame
     void Update()
     {
-
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {
@@ -88,6 +82,11 @@ public class Maze : MonoBehaviour
                 lastMazeUnit.traversed = true;
                 //MazeUnit nextToLastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
             }
+        } else
+        {
+            GameManager.finishedGeneratingMaze = true;
+            Debug.Log("Finished generating the maze");
+            return;
         }
     }
     

@@ -20,10 +20,19 @@ public class UI : MonoBehaviour
     private GameObject _mazeHeightSlider;
     [SerializeField]
     private GameObject _finishedText;
+    [SerializeField]
+    private GameObject _mazeSizeInfoText;
+    [SerializeField]
+    private GameObject _mazeUnitSizeInfoText;
+
 
     public void Start()
     {
         _finishedText.SetActive(false);
+        TMPro.TMP_Text mazeSizeInfoText = _mazeSizeInfoText.gameObject.GetComponent<TMPro.TMP_Text>();
+        mazeSizeInfoText.text = "Maze Size: " + GameManager.mazeWidth.ToString() + " x " + GameManager.mazeHeight.ToString();
+        TMPro.TMP_Text mazeUnitSizeInfoText = _mazeUnitSizeInfoText.gameObject.GetComponent<TMPro.TMP_Text>();
+        mazeUnitSizeInfoText.text = "Corridor Tile Size: " + GameManager.mazeUnitSize.ToString() + " x " + GameManager.mazeUnitSize.ToString();
     }
     // Update is called once per frame
     public void LoadGame()

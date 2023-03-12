@@ -18,4 +18,16 @@ public class GameManager : MonoBehaviour
         finishedGeneratingMaze = false;
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            QuitGame();
+        }
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

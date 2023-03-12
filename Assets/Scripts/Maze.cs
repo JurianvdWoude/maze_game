@@ -1,11 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Profiling;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// The individual squares that make up a maze 
@@ -74,7 +69,7 @@ public class Maze : MonoBehaviour
         }
         // static batching the maze to reduce CPU usage when rendering
         _frames++;
-        if (_frames % 60 == 0)
+        if (_frames % 120 == 0)
         {
             _gos = _maze.ConvertAll<GameObject>(unit => unit.mazeUnitGameObject).ToArray<GameObject>();
             if (_gos != null)

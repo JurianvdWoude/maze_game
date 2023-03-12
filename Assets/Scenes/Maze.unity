@@ -3691,8 +3691,6 @@ MonoBehaviour:
   _mazeHeight: 0
   _mazeUnitHeight: 1
   _mazeUnitWidth: 1
-  _startingXCoordinate: 0
-  _startingYCoordinate: 0
   _staticBatch: {fileID: 600871026}
 --- !u!4 &1682926446
 Transform:

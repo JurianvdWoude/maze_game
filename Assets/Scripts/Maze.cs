@@ -8,18 +8,18 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// THe individual squares that make up a maze 
+/// The individual squares that make up a maze 
 /// </summary>
 public class MazeUnit
 {
-    public Vector3 mazePosition { get; set; }
     public bool traversed { get; set; }
     public GameObject mazeUnitGameObject { get; set; }
+    public Vector3 mazePosition { get; set; }
     public MazeUnit(Vector3 mazePosition, bool traversed, GameObject mazeUnitGameObject)
     {
-        this.mazePosition = mazePosition;
         this.traversed = traversed;
         this.mazeUnitGameObject = mazeUnitGameObject;
+        this.mazePosition = mazePosition;
     }
 }
 
@@ -42,10 +42,6 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private float _mazeUnitWidth;
     [SerializeField]
-    private int _startingXCoordinate = 0;
-    [SerializeField]
-    private int _startingYCoordinate = 0;
-    [SerializeField]
     private GameObject _staticBatch;
     private GameObject[] _gos;
     private int _frames;
@@ -53,7 +49,6 @@ public class Maze : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // temporarily add the maze values here
         _mazeWidth = GameManager.mazeWidth;
         _mazeHeight = GameManager.mazeHeight;
         _mazeUnitHeight = GameManager.mazeUnitSize;
@@ -66,7 +61,7 @@ public class Maze : MonoBehaviour
 
         _mazeUnitGameObject.transform.localScale = new Vector3(_mazeUnitWidth, _mazeUnitHeight, 1);
         GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
-        MazeUnit mazeUnit = new MazeUnit(new Vector3(0,0,0), false, mazeUnitGameObject);
+        MazeUnit mazeUnit = new MazeUnit(new Vector3(0, 0, 0), false, mazeUnitGameObject);
         _maze.Add(mazeUnit);
     }
 
@@ -91,9 +86,7 @@ public class Maze : MonoBehaviour
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {
-            Vector3 lastMazeUnitPosition = lastMazeUnit.mazePosition;
-
-            List<Direction> positionValues = _CheckIfBordering(lastMazeUnitPosition);
+            List<Direction> positionValues = _CheckIfBordering(lastMazeUnit);
 
             if (positionValues.Count > 0)
             {
@@ -103,7 +96,6 @@ public class Maze : MonoBehaviour
             } else
             {
                 lastMazeUnit.traversed = true;
-                //MazeUnit nextToLastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
             }
         } else
         {
@@ -111,13 +103,23 @@ public class Maze : MonoBehaviour
         }
     }
     
-    private List<Direction> _CheckIfBordering(Vector3 lastMazeUnitPosition)
+    private List<Direction> _CheckIfBordering(MazeUnit lastMazeUnit)
     {
+        Vector3 lastMazeUnitPosition = lastMazeUnit.mazePosition;
         List<Direction> positionValues = new List<Direction>();
+        MazeUnit neighborLeft = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1 * _mazeUnitWidth, 0, 0)));
+        MazeUnit neighborUp = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, _mazeUnitHeight, 0)));
+        bool hasNeighborLeft = false;
+        bool hasNeighborUp = false;
+        if (neighborLeft != null) {
+            hasNeighborLeft = true;
+        }
+        if (neighborUp != null)
+        {
+            hasNeighborUp = true;
+        }
 
-        bool hasNeighborLeft = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1 * _mazeUnitWidth, 0, 0)));
         bool hasNeighborRight = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(_mazeUnitWidth, 0, 0)));
-        bool hasNeighborUp = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, _mazeUnitHeight, 0)));
         bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, -1 * _mazeUnitHeight, 0)));
 
         if (_mazeHeight < 5)
@@ -127,6 +129,27 @@ public class Maze : MonoBehaviour
         if (_mazeWidth < 5)
         {
             _mazeWidth = 5;
+        }
+
+        if(hasNeighborLeft)
+        {
+            Transform neightborLeftRightWall = neighborLeft.mazeUnitGameObject.transform.Find("RightWall");
+            Transform lastMazeUnitLeftWall = lastMazeUnit.mazeUnitGameObject.transform.Find("LeftWall");
+            if (neightborLeftRightWall != null && lastMazeUnitLeftWall != null && neightborLeftRightWall.position == lastMazeUnitLeftWall.position)
+            {
+                neightborLeftRightWall.parent = null;
+                Destroy(neightborLeftRightWall.gameObject);
+            }
+        }
+        if (hasNeighborUp)
+        {
+            Transform neightborTopBottomWall = neighborUp.mazeUnitGameObject.transform.Find("BottomWall");
+            Transform lastMazeUnitTopWall = lastMazeUnit.mazeUnitGameObject.transform.Find("TopWall");
+            if (neightborTopBottomWall != null && lastMazeUnitTopWall != null && neightborTopBottomWall.position == lastMazeUnitTopWall.position)
+            {
+                neightborTopBottomWall.parent = null;
+                Destroy(neightborTopBottomWall.gameObject);
+            }
         }
 
         if (lastMazeUnitPosition.x < _mazeWidth && !hasNeighborRight)
@@ -159,11 +182,10 @@ public class Maze : MonoBehaviour
     private void _ExtendMaze(Direction direction, MazeUnit lastMazeUnit)
     {
         // get the last square of the maze
-        // MazeUnit lastMazeUnit = _maze.LastOrDefault();
+        //MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {
-        int lastMazeUnitIndex = _maze.LastIndexOf(lastMazeUnit);
-        Vector3 lastMazeUnitPosition = lastMazeUnit.mazeUnitGameObject.transform.position;
+            Vector3 lastMazeUnitPosition = lastMazeUnit.mazePosition;
 
             Vector3 directionToMoveTo = new Vector3(0, 0, 0);
             string oldMazeUnitWallName = "";
@@ -210,10 +232,13 @@ public class Maze : MonoBehaviour
                 {
                     Transform newMazeUnitWallToRemove = newMazeUnitGameObject.transform.Find(newMazeUnitWallName);
                     // remove the wall in the extension that borders the maze 
-                    newMazeUnitWallToRemove.parent = null;
-                    Destroy(newMazeUnitWallToRemove.gameObject);
-                    MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position, false, newMazeUnitGameObject);
-                    _maze.Add(newMazeUnit);
+                    if (newMazeUnitWallToRemove != null)
+                    {
+                        newMazeUnitWallToRemove.parent = null;
+                        Destroy(newMazeUnitWallToRemove.gameObject);
+                        MazeUnit newMazeUnit = new MazeUnit(newMazeUnitGameObject.transform.position,false, newMazeUnitGameObject);
+                        _maze.Add(newMazeUnit);
+                    }
                 }
                 else
                 {
@@ -222,7 +247,7 @@ public class Maze : MonoBehaviour
             }
             else
             {
-                Debug.Log("LeftWall doesn't exist");
+                Debug.Log("Cannot find wall to remove in the last maze unit");
             }
         }
     }

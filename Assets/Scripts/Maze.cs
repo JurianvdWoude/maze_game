@@ -30,6 +30,8 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private GameObject _mazeUnitGameObject;
     [SerializeField]
+    private GameObject _highPolyMazeUnitGameObject;
+    [SerializeField]
     private GameObject _mainCamera;
     [SerializeField]
     private float _mazeWidth;
@@ -71,6 +73,10 @@ public class Maze : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(GameManager.finishedGeneratingMaze)
+        {
+            return;
+        }
         // static batching the maze to reduce CPU usage when rendering
         _frames++;
         if (_frames % 60 == 0)
@@ -102,7 +108,6 @@ public class Maze : MonoBehaviour
         } else
         {
             GameManager.finishedGeneratingMaze = true;
-            //return;
         }
     }
     

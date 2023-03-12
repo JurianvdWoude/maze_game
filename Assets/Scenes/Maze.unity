@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -639,7 +639,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &373252353
 Light:
   m_ObjectHideFlags: 0
@@ -3174,7 +3174,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1501898585
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3247,8 +3247,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501898584}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 150, y: 150, z: 0.5}
-  m_LocalScale: {x: 50, y: 1, z: 50}
+  m_LocalPosition: {x: 125, y: 125, z: 0.5}
+  m_LocalScale: {x: 55, y: 1, z: 55}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3684,7 +3684,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cda37ca55aaa2a849896f7603874eff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mazeUnitGameObject: {fileID: 5925193286811070721, guid: fc66d202922bdd5489c0f216e30f7314, type: 3}
+  _mazeUnitGameObject: {fileID: 2112890209131150891, guid: 5f0f375767453f14680e5cd20f6c8f4a, type: 3}
+  _highPolyMazeUnitGameObject: {fileID: 5925193286811070721, guid: fc66d202922bdd5489c0f216e30f7314, type: 3}
   _mainCamera: {fileID: 972717508}
   _mazeWidth: 0
   _mazeHeight: 0
@@ -3692,6 +3693,7 @@ MonoBehaviour:
   _mazeUnitWidth: 1
   _startingXCoordinate: 0
   _startingYCoordinate: 0
+  _staticBatch: {fileID: 600871026}
 --- !u!4 &1682926446
 Transform:
   m_ObjectHideFlags: 0

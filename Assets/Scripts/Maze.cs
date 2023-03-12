@@ -47,8 +47,8 @@ public class Maze : MonoBehaviour
     void Start()
     {
         // temporarily add the maze values here
-        _mazeWidth = GameManager.mazeSize;
-        _mazeHeight = GameManager.mazeSize;
+        _mazeWidth = GameManager.mazeWidth;
+        _mazeHeight = GameManager.mazeHeight;
         _mazeUnitHeight = GameManager.mazeUnitSize;
         _mazeUnitWidth = GameManager.mazeUnitSize;
 
@@ -85,8 +85,7 @@ public class Maze : MonoBehaviour
         } else
         {
             GameManager.finishedGeneratingMaze = true;
-            Debug.Log("Finished generating the maze");
-            return;
+            //return;
         }
     }
     

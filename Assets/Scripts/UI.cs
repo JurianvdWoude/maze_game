@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+public class UI : MonoBehaviour
 {
     [SerializeField]
     private GameObject _mazeUnitSizeInput;
@@ -19,7 +18,14 @@ public class MainMenu : MonoBehaviour
     private GameObject _mazeHeightInput;
     [SerializeField]
     private GameObject _mazeHeightSlider;
+    [SerializeField]
+    private GameObject _finishedText;
 
+    public void Start()
+    {
+        _finishedText.SetActive(false);
+    }
+    // Update is called once per frame
     public void LoadGame()
     {
         SceneManager.LoadScene(1);
@@ -27,24 +33,30 @@ public class MainMenu : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.finishedGeneratingMaze)
+        {
+            _finishedText.SetActive(true);
+        }
+
+
         TMPro.TMP_InputField mazeUnitInputField = _mazeUnitSizeInput.gameObject.GetComponent<TMPro.TMP_InputField>();
         Slider mazeUnitSliderField = _mazeUnitSizeSlider.gameObject.GetComponent<Slider>();
-        if 
+        if
         (
-            mazeUnitInputField.text != null && 
-            int.TryParse(mazeUnitInputField.text, out _) && 
+            mazeUnitInputField.text != null &&
+            int.TryParse(mazeUnitInputField.text, out _) &&
             mazeUnitInputField.text != GameManager.mazeUnitSize.ToString()
         )
         {
             GameManager.mazeUnitSize = float.Parse(mazeUnitInputField.text);
             mazeUnitSliderField.value = GameManager.mazeUnitSize;
         }
-        else if (mazeUnitSliderField != null )
+        else if (mazeUnitSliderField != null)
         {
             GameManager.mazeUnitSize = mazeUnitSliderField.value;
             mazeUnitInputField.text = GameManager.mazeUnitSize.ToString();
-        } 
-        
+        }
+
         else
         {
             GameManager.mazeUnitSize = 1f;

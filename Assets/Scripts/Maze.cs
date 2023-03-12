@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Profiling;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -42,6 +43,10 @@ public class Maze : MonoBehaviour
     private int _startingXCoordinate = 0;
     [SerializeField]
     private int _startingYCoordinate = 0;
+    [SerializeField]
+    private GameObject _staticBatch;
+    private GameObject[] _gos;
+    private int _frames;
 
     // Start is called before the first frame update
     void Start()
@@ -51,6 +56,7 @@ public class Maze : MonoBehaviour
         _mazeHeight = GameManager.mazeHeight;
         _mazeUnitHeight = GameManager.mazeUnitSize;
         _mazeUnitWidth = GameManager.mazeUnitSize;
+        _frames = 0;
 
         // adjust the camera
         float largestWidthOrHeight = _mazeWidth > _mazeHeight ? _mazeWidth : _mazeHeight;
@@ -65,6 +71,17 @@ public class Maze : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // static batching the maze to reduce CPU usage when rendering
+        _frames++;
+        if (_frames % 60 == 0)
+        {
+            _gos = _maze.ConvertAll<GameObject>(unit => unit.mazeUnitGameObject).ToArray<GameObject>();
+            if (_gos != null)
+            {
+                UnityEngine.StaticBatchingUtility.Combine(_gos, _staticBatch);
+            }
+        }
+        
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {

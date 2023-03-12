@@ -65,7 +65,6 @@ public class UI : MonoBehaviour
             GameManager.mazeUnitSize = mazeUnitSliderField.value;
             mazeUnitInputField.text = GameManager.mazeUnitSize.ToString();
         }
-
         else
         {
             GameManager.mazeUnitSize = 1f;

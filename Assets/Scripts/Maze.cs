@@ -37,6 +37,8 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private float _mazeUnitWidth;
     [SerializeField]
+    private Material _wallMaterials;
+    [SerializeField]
     private GameObject _staticBatch;
     private GameObject[] _gos;
     private int _frames;
@@ -91,6 +93,15 @@ public class Maze : MonoBehaviour
             } else
             {
                 lastMazeUnit.traversed = true;
+
+                Renderer[] renderers = lastMazeUnit.mazeUnitGameObject.GetComponentsInChildren<Renderer>();
+                if (renderers != null)
+                {
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.material = _wallMaterials;
+                    }
+                }
             }
         } else
         {

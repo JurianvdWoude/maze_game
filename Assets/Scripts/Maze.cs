@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -25,7 +26,15 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private GameObject _mazeUnitGameObject;
     [SerializeField]
-    private GameObject _highPolyMazeUnitGameObject;
+    private GameObject _highPolyWall1;
+    [SerializeField]
+    private GameObject _highPolyWall2;
+    [SerializeField]
+    private GameObject _highPolyPillar1;
+    [SerializeField]
+    private GameObject _highPolyPillar2;
+    [SerializeField]
+    private GameObject _highPolyPillar3;
     [SerializeField]
     private GameObject _mainCamera;
     [SerializeField]
@@ -38,6 +47,7 @@ public class Maze : MonoBehaviour
     private float _mazeUnitWidth;
     [SerializeField]
     private Material _wallMaterials;
+
     [SerializeField]
     private GameObject _staticBatch;
     private GameObject[] _gos;
@@ -46,10 +56,18 @@ public class Maze : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         _mazeWidth = GameManager.mazeWidth;
         _mazeHeight = GameManager.mazeHeight;
         _mazeUnitHeight = GameManager.mazeUnitSize;
         _mazeUnitWidth = GameManager.mazeUnitSize;
+
+        _highPolyWall1.transform.localScale = new Vector3(GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f);
+        _highPolyWall2.transform.localScale = new Vector3(GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f);
+        _highPolyPillar1.transform.localScale = new Vector3(GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f);
+        _highPolyPillar2.transform.localScale = new Vector3(GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f);
+        _highPolyPillar3.transform.localScale = new Vector3(GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f, GameManager.mazeUnitSize * 0.25f);
+
         _frames = 0;
 
         // check get the width or height of the maze, depending on which one is larger
@@ -70,10 +88,11 @@ public class Maze : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(GameManager.finishedGeneratingMaze)
+        if(GameManager.finishedRenderingMaze)
         {
             return;
         }
+        
         // count the number of frames
         _frames++;
         // static batching the maze to reduce CPU usage when rendering every 120 frames
@@ -86,7 +105,39 @@ public class Maze : MonoBehaviour
                 UnityEngine.StaticBatchingUtility.Combine(_gos, _staticBatch);
             }
         }
-        
+
+        if (GameManager.finishedGeneratingMaze)
+        {
+            foreach (MazeUnit mazeUnit in _maze)
+            {
+                for (int i = 0; i < mazeUnit.mazeUnitGameObject.transform.childCount; i++)
+                {
+                    Transform wall = mazeUnit.mazeUnitGameObject.transform.GetChild(i);
+
+                    GameObject newWall = null;
+                    if (Random.Range(0, 2) == 0)
+                    {
+                        newWall = _highPolyWall1;
+                    }
+                    else
+                    {
+                        newWall = _highPolyWall2;
+                    }
+
+                    Vector3 rotation = new Vector3(0, 0, 0);
+                    if (wall.name == "LeftWall" || wall.name == "RightWall")
+                    {
+                        rotation = new Vector3(0, 90, 0);
+                    }
+                    Instantiate(newWall, wall.position + new Vector3(0, 0.5f, 0), Quaternion.Euler(rotation));
+                    Destroy(wall.gameObject);
+                }
+                Destroy(mazeUnit.mazeUnitGameObject);
+            }
+            GameManager.finishedRenderingMaze = true;
+            return;
+        }
+
         // get the last tile of the maze added to the list that cannot grow a new corridor
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)

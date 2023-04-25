@@ -44,7 +44,13 @@ public class UI : MonoBehaviour
     {
         if (GameManager.finishedGeneratingMaze)
         {
+            _finishedText.GetComponent<TMPro.TMP_Text>().text = "Finished Generating the Maze!";
             _finishedText.SetActive(true);
+        }
+
+        if (GameManager.finishedRenderingMaze)
+        {
+            _finishedText.GetComponent<TMPro.TMP_Text>().text = "Finished Rendering the Maze!";
         }
 
 

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -639,7 +639,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &373252353
 Light:
   m_ObjectHideFlags: 0
@@ -3955,7 +3955,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mazeUnitGameObject: {fileID: 2112890209131150891, guid: 5f0f375767453f14680e5cd20f6c8f4a, type: 3}
-  _highPolyMazeUnitGameObject: {fileID: 5925193286811070721, guid: fc66d202922bdd5489c0f216e30f7314, type: 3}
+  _highPolyWall1: {fileID: 919132149155446097, guid: a90637c0228cd4e44b471ce342c7ea49, type: 3}
+  _highPolyWall2: {fileID: 919132149155446097, guid: 0534c1f5702bd1241af4c64b530e8d11, type: 3}
+  _highPolyPillar1: {fileID: 919132149155446097, guid: e387bc020c448b04eb6598a11fa693c3, type: 3}
+  _highPolyPillar2: {fileID: 919132149155446097, guid: 1515e522c23955a4cb6087d6691880e4, type: 3}
+  _highPolyPillar3: {fileID: 919132149155446097, guid: 21b41456fb455654c93da69f4dc72748, type: 3}
   _mainCamera: {fileID: 972717508}
   _mazeWidth: 0
   _mazeHeight: 0

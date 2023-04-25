@@ -108,14 +108,19 @@ public class Maze : MonoBehaviour
 
         if (GameManager.finishedGeneratingMaze)
         {
+            // go through all the maze tiles in the maze
             foreach (MazeUnit mazeUnit in _maze)
             {
+                // go through all the walls of the selected maze tile
                 for (int i = 0; i < mazeUnit.mazeUnitGameObject.transform.childCount; i++)
                 {
+                    // get the wall from the maze tile 
                     Transform wall = mazeUnit.mazeUnitGameObject.transform.GetChild(i);
 
                     GameObject newWall = null;
-                    if (Random.Range(0, 2) == 0)
+                    // get a random mesh for rendering the new wall of the maze tile 
+                    int randomNumber = (int)Random.Range(0, 2);
+                    if (randomNumber == 0)
                     {
                         newWall = _highPolyWall1;
                     }
@@ -123,16 +128,38 @@ public class Maze : MonoBehaviour
                     {
                         newWall = _highPolyWall2;
                     }
-
+                    // create a new rotation Quaternion based on the orientation of the original wall  
                     Vector3 rotation = new Vector3(0, 0, 0);
                     if (wall.name == "LeftWall" || wall.name == "RightWall")
                     {
                         rotation = new Vector3(0, 90, 0);
                     }
+                    // instantiate the new wall 
                     Instantiate(newWall, wall.position + new Vector3(0, 0.5f, 0), Quaternion.Euler(rotation));
                     Destroy(wall.gameObject);
                 }
                 Destroy(mazeUnit.mazeUnitGameObject);
+            }
+            for(int x = 0; x <= _mazeWidth; x++)
+            {
+                for(int z = 0; z <= _mazeHeight; z++)
+                {
+                    int randomNumber = (int)Random.Range(0, 3);
+                    GameObject newPillar = null;
+                    if (randomNumber == 0)
+                    {
+                        newPillar = _highPolyPillar1;
+                    }
+                    else if (randomNumber == 1)
+                    {
+                        newPillar = _highPolyPillar2;
+                    } 
+                    else
+                    {
+                        newPillar = _highPolyPillar3;
+                    }
+                    Instantiate(newPillar, new Vector3(x * _mazeUnitWidth - 0.5f, 0.375f, z * _mazeUnitHeight - 0.5f), Quaternion.Euler(new Vector3(90, 0, 0)));
+                }
             }
             GameManager.finishedRenderingMaze = true;
             return;
@@ -236,7 +263,7 @@ public class Maze : MonoBehaviour
 
         // if the tile being checked doesn't have a neighbor or is near the maze's border
         // in a particular direction, then put that direction as an enum value in a list 
-        if (lastMazeUnitPosition.x < _mazeWidth && !hasNeighborRight)
+        if (lastMazeUnitPosition.x < _mazeWidth - 1 && !hasNeighborRight)
         {
             positionValues.Add(Direction.right);
         }
@@ -244,7 +271,7 @@ public class Maze : MonoBehaviour
         {
             positionValues.Add(Direction.left);
         }
-        if (lastMazeUnitPosition.z < _mazeHeight && !hasNeighborUp)
+        if (lastMazeUnitPosition.z < _mazeHeight - 1 && !hasNeighborUp)
         {
             positionValues.Add(Direction.up);
         }

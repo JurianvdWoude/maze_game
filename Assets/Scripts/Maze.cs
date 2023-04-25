@@ -55,13 +55,13 @@ public class Maze : MonoBehaviour
         // check get the width or height of the maze, depending on which one is larger
         float largestWidthOrHeight = _mazeWidth > _mazeHeight ? _mazeWidth : _mazeHeight;
         // set the camera to the center and zoom out based on the size of the maze 
-        _mainCamera.transform.position = new Vector3(_mazeWidth / 2, _mazeHeight / 2, -1 * largestWidthOrHeight - 5);
+        _mainCamera.transform.position = new Vector3(_mazeWidth / 2, largestWidthOrHeight + 5, _mazeHeight / 2);
 
         // set the size of the maze's tiles to the values set in the menu by the player
         _mazeUnitGameObject.transform.localScale = new Vector3(_mazeUnitWidth, _mazeUnitHeight, 1);
         // create the first tile of the maze at position x=0, y=0.
         // this is done so that the list of gameobjects has at least 1 value from which to grow the maze.
-        GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
+        GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.Euler(new Vector3(90, 0, 0)));
         MazeUnit mazeUnit = new MazeUnit(new Vector3(0, 0, 0), false, mazeUnitGameObject);
         // add the first created tile in the maze to the list
         _maze.Add(mazeUnit);
@@ -132,7 +132,7 @@ public class Maze : MonoBehaviour
         // the MazeUnit class is needed to remove potential duplicate walls later on
         MazeUnit neighborLeft = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1 * _mazeUnitWidth, 0, 0)));
         // get the neighboring tile to the left of the tile being checked, if it exists
-        MazeUnit neighborUp = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, _mazeUnitHeight, 0)));
+        MazeUnit neighborUp = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, 0, _mazeUnitHeight)));
         bool hasNeighborLeft = false;
         bool hasNeighborUp = false;
         if (neighborLeft != null) {
@@ -144,7 +144,7 @@ public class Maze : MonoBehaviour
         }
 
         bool hasNeighborRight = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(_mazeUnitWidth, 0, 0)));
-        bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, -1 * _mazeUnitHeight, 0)));
+        bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, 0, -1 * _mazeUnitHeight)));
 
         // set a minimum width and height for the maze 
         if (_mazeHeight < 5)
@@ -193,11 +193,11 @@ public class Maze : MonoBehaviour
         {
             positionValues.Add(Direction.left);
         }
-        if (lastMazeUnitPosition.y < _mazeHeight && !hasNeighborUp)
+        if (lastMazeUnitPosition.z < _mazeHeight && !hasNeighborUp)
         {
             positionValues.Add(Direction.up);
         }
-        if (lastMazeUnitPosition.y > 0 && !hasNeighborDown)
+        if (lastMazeUnitPosition.z > 0 && !hasNeighborDown)
         {
             positionValues.Add(Direction.down);
         }
@@ -229,12 +229,12 @@ public class Maze : MonoBehaviour
             switch (direction)
             {
                 case Direction.up:
-                    directionToMoveTo = new Vector3(0, _mazeUnitHeight, 0);
+                    directionToMoveTo = new Vector3(0, 0, _mazeUnitHeight);
                     oldMazeUnitWallName = "TopWall";
                     newMazeUnitWallName = "BottomWall";
                     break;
                 case Direction.down:
-                    directionToMoveTo = new Vector3(0, -1 * _mazeUnitHeight, 0);
+                    directionToMoveTo = new Vector3(0, 0, -1 * _mazeUnitHeight);
                     oldMazeUnitWallName = "BottomWall";
                     newMazeUnitWallName = "TopWall";
                     break;
@@ -261,7 +261,7 @@ public class Maze : MonoBehaviour
                 lastMazeUnitWallToRemove.parent = null;
                 Destroy(lastMazeUnitWallToRemove.gameObject);
                 // create the extension of the maze 
-                GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + directionToMoveTo, Quaternion.identity);
+                GameObject newMazeUnitGameObject = Instantiate(_mazeUnitGameObject, lastMazeUnitPosition + directionToMoveTo, Quaternion.Euler(new Vector3(90, 0, 0)));
                 if (newMazeUnitGameObject != null)
                 {
                     Transform newMazeUnitWallToRemove = newMazeUnitGameObject.transform.Find(newMazeUnitWallName);

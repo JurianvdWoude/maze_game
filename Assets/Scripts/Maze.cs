@@ -52,13 +52,18 @@ public class Maze : MonoBehaviour
         _mazeUnitWidth = GameManager.mazeUnitSize;
         _frames = 0;
 
-        // adjust the camera
+        // check get the width or height of the maze, depending on which one is larger
         float largestWidthOrHeight = _mazeWidth > _mazeHeight ? _mazeWidth : _mazeHeight;
+        // set the camera to the center and zoom out based on the size of the maze 
         _mainCamera.transform.position = new Vector3(_mazeWidth / 2, _mazeHeight / 2, -1 * largestWidthOrHeight - 5);
 
+        // set the size of the maze's tiles to the values set in the menu by the player
         _mazeUnitGameObject.transform.localScale = new Vector3(_mazeUnitWidth, _mazeUnitHeight, 1);
+        // create the first tile of the maze at position x=0, y=0.
+        // this is done so that the list of gameobjects has at least 1 value from which to grow the maze.
         GameObject mazeUnitGameObject = Instantiate(_mazeUnitGameObject, new Vector3(0, 0, 0), Quaternion.identity);
         MazeUnit mazeUnit = new MazeUnit(new Vector3(0, 0, 0), false, mazeUnitGameObject);
+        // add the first created tile in the maze to the list
         _maze.Add(mazeUnit);
     }
 
@@ -69,10 +74,12 @@ public class Maze : MonoBehaviour
         {
             return;
         }
-        // static batching the maze to reduce CPU usage when rendering
+        // count the number of frames
         _frames++;
+        // static batching the maze to reduce CPU usage when rendering every 120 frames
         if (_frames % 120 == 0)
         {
+            // gather all gameobjects from the list and convert them all to an array
             _gos = _maze.ConvertAll<GameObject>(unit => unit.mazeUnitGameObject).ToArray<GameObject>();
             if (_gos != null)
             {
@@ -80,11 +87,12 @@ public class Maze : MonoBehaviour
             }
         }
         
+        // get the last tile of the maze added to the list that cannot grow a new corridor
         MazeUnit lastMazeUnit = _maze.LastOrDefault(unit => unit.traversed == false);
         if (lastMazeUnit != null)
         {
+            // get a list of directions in which the maze can grow
             List<Direction> positionValues = _CheckIfBordering(lastMazeUnit);
-
             if (positionValues.Count > 0)
             {
                 System.Random _random = new System.Random();
@@ -92,28 +100,38 @@ public class Maze : MonoBehaviour
                 _ExtendMaze(randomPosition, lastMazeUnit);
             } else
             {
+                // if there are no directions, then set traversed to true
                 lastMazeUnit.traversed = true;
 
+                // get the renderers for all of the walls in that traversed tile in the maze.
+                // the renderer can be used to change to color as a visual indicator that it cannot grow a coridor.
                 Renderer[] renderers = lastMazeUnit.mazeUnitGameObject.GetComponentsInChildren<Renderer>();
                 if (renderers != null)
                 {
                     foreach (Renderer renderer in renderers)
                     {
+                        // change the color of the tile
                         renderer.material = _wallMaterials;
                     }
                 }
             }
         } else
         {
+            // if there are no tiles in the maze that can grow, then the maze has finished generating
             GameManager.finishedGeneratingMaze = true;
         }
     }
     
     private List<Direction> _CheckIfBordering(MazeUnit lastMazeUnit)
     {
+        // get the position of the tile being checked
         Vector3 lastMazeUnitPosition = lastMazeUnit.mazePosition;
+        // create a list of possible directions to expand the maze to from the last tile
         List<Direction> positionValues = new List<Direction>();
+        // get the neighboring tile to the left of the tile being checked, if it exists
+        // the MazeUnit class is needed to remove potential duplicate walls later on
         MazeUnit neighborLeft = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(-1 * _mazeUnitWidth, 0, 0)));
+        // get the neighboring tile to the left of the tile being checked, if it exists
         MazeUnit neighborUp = _maze.Find(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, _mazeUnitHeight, 0)));
         bool hasNeighborLeft = false;
         bool hasNeighborUp = false;
@@ -128,6 +146,7 @@ public class Maze : MonoBehaviour
         bool hasNeighborRight = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(_mazeUnitWidth, 0, 0)));
         bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, -1 * _mazeUnitHeight, 0)));
 
+        // set a minimum width and height for the maze 
         if (_mazeHeight < 5)
         {
             _mazeHeight = 5;
@@ -137,27 +156,35 @@ public class Maze : MonoBehaviour
             _mazeWidth = 5;
         }
 
+        // check if there is a tile to the left of the tile being checked
         if(hasNeighborLeft)
         {
-            Transform neightborLeftRightWall = neighborLeft.mazeUnitGameObject.transform.Find("RightWall");
-            Transform lastMazeUnitLeftWall = lastMazeUnit.mazeUnitGameObject.transform.Find("LeftWall");
-            if (neightborLeftRightWall != null && lastMazeUnitLeftWall != null && neightborLeftRightWall.position == lastMazeUnitLeftWall.position)
+            Transform rightWallOfNeighborLeft = neighborLeft.mazeUnitGameObject.transform.Find("RightWall");
+            Transform leftWallOfLastMazeUnit = lastMazeUnit.mazeUnitGameObject.transform.Find("LeftWall");
+            // check if there are overlapping walls between the tile being checked and its neighbor on the left
+            if (rightWallOfNeighborLeft != null && leftWallOfLastMazeUnit != null && rightWallOfNeighborLeft.position == leftWallOfLastMazeUnit.position)
             {
-                neightborLeftRightWall.parent = null;
-                Destroy(neightborLeftRightWall.gameObject);
+                // if they overlap, then delete the wall from the neighbor
+                rightWallOfNeighborLeft.parent = null;
+                Destroy(rightWallOfNeighborLeft.gameObject);
             }
         }
+        // check if there is a tile above the tile being checked
         if (hasNeighborUp)
         {
-            Transform neightborTopBottomWall = neighborUp.mazeUnitGameObject.transform.Find("BottomWall");
-            Transform lastMazeUnitTopWall = lastMazeUnit.mazeUnitGameObject.transform.Find("TopWall");
-            if (neightborTopBottomWall != null && lastMazeUnitTopWall != null && neightborTopBottomWall.position == lastMazeUnitTopWall.position)
+            Transform bottomWallOfNeighborUp = neighborUp.mazeUnitGameObject.transform.Find("BottomWall");
+            Transform topWallOfLastMazeUnit = lastMazeUnit.mazeUnitGameObject.transform.Find("TopWall");
+            // check if there are overlapping walls between the tile being checked and its neighbor above it
+            if (bottomWallOfNeighborUp != null && topWallOfLastMazeUnit != null && bottomWallOfNeighborUp.position == topWallOfLastMazeUnit.position)
             {
-                neightborTopBottomWall.parent = null;
-                Destroy(neightborTopBottomWall.gameObject);
+                // if they overlap, then delete the wall from the neighbor
+                bottomWallOfNeighborUp.parent = null;
+                Destroy(bottomWallOfNeighborUp.gameObject);
             }
         }
 
+        // if the tile being checked doesn't have a neighbor or is near the maze's border
+        // in a particular direction, then put that direction as an enum value in a list 
         if (lastMazeUnitPosition.x < _mazeWidth && !hasNeighborRight)
         {
             positionValues.Add(Direction.right);
@@ -197,7 +224,8 @@ public class Maze : MonoBehaviour
             string oldMazeUnitWallName = "";
             string newMazeUnitWallName = "";
 
-            // check the direction to extend the maze to 
+            // check the direction to extend the maze to from the maze tile being checked  
+            // the WallNames will be used to remove walls between the created tile and the corridor
             switch (direction)
             {
                 case Direction.up:

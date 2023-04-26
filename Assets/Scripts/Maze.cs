@@ -35,6 +35,8 @@ public class Maze : MonoBehaviour
     private GameObject _highPolyPillar2;
     [SerializeField]
     private GameObject _highPolyPillar3;
+    [SerializeField]
+    private GameObject _goal;
 
     [Space(10)]
     [SerializeField]
@@ -64,10 +66,8 @@ public class Maze : MonoBehaviour
     void Start()
     {
         _playerCamera.transform.position = new Vector3(0, 0.5f, 0);
-        _mainCamera.SetActive(true);
-        _playerCamera.SetActive(false);
-        //_mainCamera.GetComponent<Camera>().enabled = true;
-        //_playerCamera.GetComponent<Camera>().enabled = false;
+        SetCameraMode();
+        _goal.SetActive(false);
 
         _mazeWidth = GameManager.mazeWidth;
         _mazeHeight = GameManager.mazeHeight;
@@ -97,14 +97,50 @@ public class Maze : MonoBehaviour
         _maze.Add(mazeUnit);
     }
 
+    void SetCameraMode()
+    {
+        if(GameManager.firstPersonMode)
+        {
+            _playerCamera.SetActive(true);
+            _mainCamera.SetActive(false);
+        } else
+        {
+            _playerCamera.SetActive(false);
+            _mainCamera.SetActive(true);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         if(GameManager.finishedRenderingMaze)
         {
+            SetCameraMode();
             return;
         }
-        
+        if (GameManager.finishedGeneratingMaze)
+        {
+            if(GameManager.startGame)
+            {
+                if(!GameManager.wonTheGameBefore)
+                {
+                    RenderHighPolyMaze();
+                }
+                GameManager.firstPersonMode = true;
+                SetCameraMode();
+                GameManager.finishedRenderingMaze = true;
+                GameManager.playGame = true;
+                GameManager.startGame = false;
+                return;
+            }
+            else
+            {
+                _goal.transform.position = new Vector3(_mazeWidth - 1, 0.5f, _mazeHeight - 1);
+                _goal.SetActive(true);
+                return;
+            }
+        }
+
         // count the number of frames
         _frames++;
         // static batching the maze to reduce CPU usage when rendering every 120 frames
@@ -116,18 +152,6 @@ public class Maze : MonoBehaviour
             {
                 UnityEngine.StaticBatchingUtility.Combine(_gos, _staticBatch);
             }
-        }
-
-        if (GameManager.finishedGeneratingMaze)
-        {
-            RenderHighPolyMaze();
-            _playerCamera.SetActive(true);
-            _mainCamera.SetActive(false);
-            //_playerCamera.GetComponent<Camera>().enabled = true;
-            //_mainCamera.GetComponent<Camera>().enabled = false;
-            
-            GameManager.finishedRenderingMaze = true;
-            return;
         }
 
         // get the last tile of the maze added to the list that cannot grow a new corridor

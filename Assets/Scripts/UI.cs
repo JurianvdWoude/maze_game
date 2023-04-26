@@ -24,35 +24,74 @@ public class UI : MonoBehaviour
     private GameObject _mazeSizeInfoText;
     [SerializeField]
     private GameObject _mazeUnitSizeInfoText;
+    [SerializeField]
+    private GameObject _playButton;
 
 
     public void Start()
     {
+        gameObject.SetActive(true);
+        _playButton.SetActive(false);
         _finishedText.SetActive(false);
         TMPro.TMP_Text mazeSizeInfoText = _mazeSizeInfoText.gameObject.GetComponent<TMPro.TMP_Text>();
         mazeSizeInfoText.text = "Maze Size: " + GameManager.mazeWidth.ToString() + " x " + GameManager.mazeHeight.ToString();
         TMPro.TMP_Text mazeUnitSizeInfoText = _mazeUnitSizeInfoText.gameObject.GetComponent<TMPro.TMP_Text>();
         mazeUnitSizeInfoText.text = "Corridor Tile Size: " + GameManager.mazeUnitSize.ToString() + " x " + GameManager.mazeUnitSize.ToString();
     }
-    // Update is called once per frame
-    public void LoadGame()
+
+    public void RestartGame()
     {
-        SceneManager.LoadScene(1);
+        GameManager.wonTheGameBefore = false;
+        GameManager.LoadGame();
     }
 
+    public void StartGame()
+    {
+        for(int i = 0; i < transform.childCount; i++)
+        {
+            Transform childObject = transform.GetChild(i);
+            childObject.gameObject.SetActive(false);
+        }
+        GameManager.startGame = true;
+    }
+
+    // Update is called once per frame
     private void Update()
     {
-        if (GameManager.finishedGeneratingMaze)
+        if (GameManager.finishedGame)
         {
-            _finishedText.GetComponent<TMPro.TMP_Text>().text = "Finished Generating the Maze!";
+            // if the game is finished, turn on the UI again
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform childObject = transform.GetChild(i);
+                childObject.gameObject.SetActive(true);
+            }
+            // state that you won via text
+            GameManager.wonTheGameBefore = true;
+            // turn on the main camera again
+            GameManager.firstPersonMode = false;
+            // set the play game state to false 
+            GameManager.playGame = false;
+            GameManager.finishedGame = false;
+        } 
+        if (GameManager.playGame)
+        {
+            _playButton.SetActive(false);
+            _finishedText.SetActive(false);
+            return;
+        }
+        else if (GameManager.finishedGeneratingMaze)
+        {
+            _playButton.SetActive(true);
+            if (GameManager.wonTheGameBefore)
+            {
+                _finishedText.GetComponent<TMPro.TMP_Text>().text = "You've won the game!";
+            } else
+            {
+                _finishedText.GetComponent<TMPro.TMP_Text>().text = "Finished Generating the Maze!";
+            }
             _finishedText.SetActive(true);
         }
-
-        if (GameManager.finishedRenderingMaze)
-        {
-            _finishedText.GetComponent<TMPro.TMP_Text>().text = "Finished Rendering the Maze!";
-        }
-
 
         TMPro.TMP_InputField mazeUnitInputField = _mazeUnitSizeInput.gameObject.GetComponent<TMPro.TMP_InputField>();
         Slider mazeUnitSliderField = _mazeUnitSizeSlider.gameObject.GetComponent<Slider>();

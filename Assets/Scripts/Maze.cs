@@ -35,8 +35,14 @@ public class Maze : MonoBehaviour
     private GameObject _highPolyPillar2;
     [SerializeField]
     private GameObject _highPolyPillar3;
+
+    [Space(10)]
     [SerializeField]
     private GameObject _mainCamera;
+    [SerializeField]
+    private GameObject _playerCamera;
+
+    [Space(10)]
     [SerializeField]
     private float _mazeWidth;
     [SerializeField]
@@ -48,6 +54,7 @@ public class Maze : MonoBehaviour
     [SerializeField]
     private Material _wallMaterials;
 
+    [Space(10)]
     [SerializeField]
     private GameObject _staticBatch;
     private GameObject[] _gos;
@@ -56,6 +63,11 @@ public class Maze : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _playerCamera.transform.position = new Vector3(0, 0.5f, 0);
+        _mainCamera.SetActive(true);
+        _playerCamera.SetActive(false);
+        //_mainCamera.GetComponent<Camera>().enabled = true;
+        //_playerCamera.GetComponent<Camera>().enabled = false;
 
         _mazeWidth = GameManager.mazeWidth;
         _mazeHeight = GameManager.mazeHeight;
@@ -108,59 +120,12 @@ public class Maze : MonoBehaviour
 
         if (GameManager.finishedGeneratingMaze)
         {
-            // go through all the maze tiles in the maze
-            foreach (MazeUnit mazeUnit in _maze)
-            {
-                // go through all the walls of the selected maze tile
-                for (int i = 0; i < mazeUnit.mazeUnitGameObject.transform.childCount; i++)
-                {
-                    // get the wall from the maze tile 
-                    Transform wall = mazeUnit.mazeUnitGameObject.transform.GetChild(i);
-
-                    GameObject newWall = null;
-                    // get a random mesh for rendering the new wall of the maze tile 
-                    int randomNumber = (int)Random.Range(0, 2);
-                    if (randomNumber == 0)
-                    {
-                        newWall = _highPolyWall1;
-                    }
-                    else
-                    {
-                        newWall = _highPolyWall2;
-                    }
-                    // create a new rotation Quaternion based on the orientation of the original wall  
-                    Vector3 rotation = new Vector3(0, 0, 0);
-                    if (wall.name == "LeftWall" || wall.name == "RightWall")
-                    {
-                        rotation = new Vector3(0, 90, 0);
-                    }
-                    // instantiate the new wall 
-                    Instantiate(newWall, wall.position + new Vector3(0, 0.5f, 0), Quaternion.Euler(rotation));
-                    Destroy(wall.gameObject);
-                }
-                Destroy(mazeUnit.mazeUnitGameObject);
-            }
-            for(int x = 0; x <= _mazeWidth; x++)
-            {
-                for(int z = 0; z <= _mazeHeight; z++)
-                {
-                    int randomNumber = (int)Random.Range(0, 3);
-                    GameObject newPillar = null;
-                    if (randomNumber == 0)
-                    {
-                        newPillar = _highPolyPillar1;
-                    }
-                    else if (randomNumber == 1)
-                    {
-                        newPillar = _highPolyPillar2;
-                    } 
-                    else
-                    {
-                        newPillar = _highPolyPillar3;
-                    }
-                    Instantiate(newPillar, new Vector3(x * _mazeUnitWidth - 0.5f, 0.375f, z * _mazeUnitHeight - 0.5f), Quaternion.Euler(new Vector3(90, 0, 0)));
-                }
-            }
+            RenderHighPolyMaze();
+            _playerCamera.SetActive(true);
+            _mainCamera.SetActive(false);
+            //_playerCamera.GetComponent<Camera>().enabled = true;
+            //_mainCamera.GetComponent<Camera>().enabled = false;
+            
             GameManager.finishedRenderingMaze = true;
             return;
         }
@@ -197,6 +162,76 @@ public class Maze : MonoBehaviour
         {
             // if there are no tiles in the maze that can grow, then the maze has finished generating
             GameManager.finishedGeneratingMaze = true;
+        }
+    }
+
+    private void RenderHighPolyMaze()
+    {
+        List<GameObject> highpolymaze = new List<GameObject>();
+        // go through all the maze tiles in the maze
+        foreach (MazeUnit mazeUnit in _maze)
+        {
+            // go through all the walls of the selected maze tile
+            for (int i = 0; i < mazeUnit.mazeUnitGameObject.transform.childCount; i++)
+            {
+                // get the wall from the maze tile 
+                Transform wall = mazeUnit.mazeUnitGameObject.transform.GetChild(i);
+
+                GameObject newWall = null;
+                // get a random mesh for rendering the new wall of the maze tile 
+                int randomNumber = (int)Random.Range(0, 2);
+                if (randomNumber == 0)
+                {
+                    newWall = _highPolyWall1;
+                }
+                else
+                {
+                    newWall = _highPolyWall2;
+                }
+                // create a new rotation Quaternion based on the orientation of the original wall  
+                Vector3 rotation = new Vector3(0, 0, 0);
+                if (wall.name == "LeftWall" || wall.name == "RightWall")
+                {
+                    rotation = new Vector3(0, 90, 0);
+                }
+                // instantiate the new wall 
+                Instantiate(newWall, wall.position + new Vector3(0, 0.5f, 0), Quaternion.Euler(rotation));
+                Destroy(wall.gameObject);
+
+                highpolymaze.Add(newWall);
+            }
+            Destroy(mazeUnit.mazeUnitGameObject);
+        }
+        // generate the pillars for the maze 
+        for (int x = 0; x <= _mazeWidth; x++)
+        {
+            for (int z = 0; z <= _mazeHeight; z++)
+            {
+                int randomNumber = (int)Random.Range(0, 3);
+                GameObject newPillar = null;
+                if (randomNumber == 0)
+                {
+                    newPillar = _highPolyPillar1;
+                }
+                else if (randomNumber == 1)
+                {
+                    newPillar = _highPolyPillar2;
+                }
+                else
+                {
+                    newPillar = _highPolyPillar3;
+                }
+                Instantiate(newPillar, new Vector3(x * _mazeUnitWidth - 0.5f, 0.375f, z * _mazeUnitHeight - 0.5f), Quaternion.Euler(new Vector3(90, 0, 0)));
+
+                highpolymaze.Add(newPillar);
+            }
+        }
+
+        // statically batch the new assets
+        GameObject[] highpolygos = highpolymaze.ToArray<GameObject>();
+        if (highpolygos != null)
+        {
+            UnityEngine.StaticBatchingUtility.Combine(highpolygos, _staticBatch);
         }
     }
     

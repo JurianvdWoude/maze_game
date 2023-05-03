@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -100,7 +102,9 @@ public class Maze : MonoBehaviour
 
     void ActivateGoal()
     {
-        _goal.transform.position = new Vector3(_mazeWidth - 1, 0.5f, _mazeHeight - 1);
+        int xPosition = Convert.ToInt32((_mazeWidth - _mazeUnitWidth) / _mazeUnitWidth);
+        int yPosition = Convert.ToInt32((_mazeHeight - _mazeUnitHeight) / _mazeUnitHeight);
+        _goal.transform.position = new Vector3(xPosition * _mazeUnitWidth, 0.5f, yPosition * _mazeUnitHeight);
         _goal.SetActive(true);
     }
 
@@ -148,6 +152,7 @@ public class Maze : MonoBehaviour
             List<Direction> positionValues = _CheckIfBordering(lastMazeUnit);
             if (positionValues.Count > 0)
             {
+                // get a random value to extend the corridor to 
                 System.Random _random = new System.Random();
                 Direction randomPosition = (Direction)positionValues[_random.Next(positionValues.Count)];
                 _ExtendMaze(randomPosition, lastMazeUnit);
@@ -186,6 +191,7 @@ public class Maze : MonoBehaviour
         // go through all the maze tiles in the maze
         foreach (MazeUnit mazeUnit in _maze)
         {
+            // if there is a maze tile with walls
             if(mazeUnit != null && mazeUnit.mazeUnitGameObject.transform.childCount > 0)
             {
                 // go through all the walls of the selected maze tile
@@ -195,8 +201,8 @@ public class Maze : MonoBehaviour
                     Transform wall = mazeUnit.mazeUnitGameObject.transform.GetChild(i);
 
                     GameObject newWall = null;
-                    // get a random mesh for rendering the new wall of the maze tile 
-                    int randomNumber = (int)Random.Range(0, 2);
+                    // get a random mesh for the new wall of the maze tile 
+                    int randomNumber = (int)UnityEngine.Random.Range(0, 2);
                     if (randomNumber == 0)
                     {
                         newWall = _highPolyWall1;
@@ -205,28 +211,40 @@ public class Maze : MonoBehaviour
                     {
                         newWall = _highPolyWall2;
                     }
-                    // create a new rotation Quaternion based on the orientation of the original wall  
+                    // create a new rotation based on the orientation of the original wall  
                     Vector3 rotation = new Vector3(0, 0, 0);
+                    // make sure that vertical facing walls are positioned that way
                     if (wall.name == "LeftWall" || wall.name == "RightWall")
                     {
                         rotation = new Vector3(0, 90, 0);
                     }
                     // instantiate the new wall 
                     Instantiate(newWall, wall.position + new Vector3(0, 0.5f, 0), Quaternion.Euler(rotation));
+                    // remove the old wall
                     Destroy(wall.gameObject);
 
+                    // add the new wall to a list that will be put through static batching later on
                     highpolymaze.Add(newWall);
                 }
+                // destroy the old maze tile
                 Destroy(mazeUnit.mazeUnitGameObject);
             }
         }
+        
+        // set the maximum number of pillars
+        int xMax = Convert.ToInt32(_mazeWidth / _mazeUnitWidth + 1f);
+        int zMax = Convert.ToInt32(_mazeHeight / _mazeUnitHeight + 1f);
+
+        GameObject newPillar = null;
+
         // generate the pillars for the maze 
-        for (int x = 0; x <= _mazeWidth; x++)
+        for (int x = 0; x < xMax; x++)
         {
-            for (int z = 0; z <= _mazeHeight; z++)
+            for (int z = 0; z < zMax; z++)
             {
-                int randomNumber = (int)Random.Range(0, 3);
-                GameObject newPillar = null;
+                // pick a random value for the pillar
+                int randomNumber = (int)UnityEngine.Random.Range(0, 3);
+                
                 if (randomNumber == 0)
                 {
                     newPillar = _highPolyPillar1;
@@ -239,8 +257,10 @@ public class Maze : MonoBehaviour
                 {
                     newPillar = _highPolyPillar3;
                 }
-                Instantiate(newPillar, new Vector3(x * _mazeUnitWidth - 0.5f, 0.375f, z * _mazeUnitHeight - 0.5f), Quaternion.Euler(new Vector3(90, 0, 0)));
+                // create the pillar
+                Instantiate(newPillar, new Vector3((x - 0.5f) * _mazeUnitWidth, 0.375f, (z - 0.5f) * _mazeUnitHeight), Quaternion.Euler(new Vector3(90, 0, 0)));
 
+                // put it on a list for static batching later on 
                 highpolymaze.Add(newPillar);
             }
         }
@@ -278,13 +298,13 @@ public class Maze : MonoBehaviour
         bool hasNeighborDown = _maze.Any(unit => unit.mazePosition == (lastMazeUnitPosition + new Vector3(0, 0, -1 * _mazeUnitHeight)));
 
         // set a minimum width and height for the maze 
-        if (_mazeHeight < 5)
+        if (_mazeHeight < 5f)
         {
-            _mazeHeight = 5;
+            _mazeHeight = 5f;
         }
-        if (_mazeWidth < 5)
+        if (_mazeWidth < 5f)
         {
-            _mazeWidth = 5;
+            _mazeWidth = 5f;
         }
 
         // check if there is a tile to the left of the tile being checked
@@ -316,19 +336,19 @@ public class Maze : MonoBehaviour
 
         // if the tile being checked doesn't have a neighbor or is near the maze's border
         // in a particular direction, then put that direction as an enum value in a list 
-        if (lastMazeUnitPosition.x < _mazeWidth - 1 && !hasNeighborRight)
+        if (Convert.ToInt32(lastMazeUnitPosition.x + 2 * _mazeUnitWidth) <= Convert.ToInt32(_mazeWidth) && !hasNeighborRight)
         {
             positionValues.Add(Direction.right);
         }
-        if (lastMazeUnitPosition.x > 0 && !hasNeighborLeft)
+        if (lastMazeUnitPosition.x > 0f && !hasNeighborLeft)
         {
             positionValues.Add(Direction.left);
         }
-        if (lastMazeUnitPosition.z < _mazeHeight - 1 && !hasNeighborUp)
+        if (Convert.ToInt32(lastMazeUnitPosition.z + 2 * _mazeUnitHeight) <= Convert.ToInt32(_mazeHeight) && !hasNeighborUp)
         {
             positionValues.Add(Direction.up);
         }
-        if (lastMazeUnitPosition.z > 0 && !hasNeighborDown)
+        if (lastMazeUnitPosition.z > 0f && !hasNeighborDown)
         {
             positionValues.Add(Direction.down);
         }

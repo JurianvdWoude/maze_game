@@ -27,6 +27,8 @@ public class Player : MonoBehaviour
         Vector3 mousePositionDifference = newMousePosition - mousePosition;
         mousePosition = newMousePosition;
 
+        Cursor.lockState = CursorLockMode.Locked;
+
         // get the change in the mouse's position in the x-axis and add it to the player's rotation
         Vector3 rotationalChange = gameObject.transform.rotation.eulerAngles + new Vector3(0, mousePositionDifference.x * playerRotationSpeed, 0); ;
         // set the player's rotation to this changed rotation

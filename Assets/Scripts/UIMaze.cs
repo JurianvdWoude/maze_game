@@ -30,12 +30,15 @@ public class UIMaze : UIBaseBehavior
         GameManager.FinishGeneratingMazeEvent += ActivatePlayButtonAndInfoBox;
 
         GameManager.StartMazeGameEvent += ToggleUI;
+        GameManager.StartMazeGameEvent += DisableCursor;
         GameManager.StopMazeGameEvent += ToggleUI;
         // when you exit from playing the game, you don't want there to be a message that you've won
         GameManager.StopMazeGameEvent += ShowRenderedMessage;
+        GameManager.StopMazeGameEvent += EnableCursor;
         GameManager.FinishMazeGameEvent += ToggleUI;
         // enable the win message when reaching the goal
         GameManager.FinishMazeGameEvent += ShowWinMessage;
+        GameManager.FinishMazeGameEvent += EnableCursor;
 
         DeactivatePlayButtonAndInfoBox();
         DisplayMazeSizeAsText();
@@ -62,6 +65,18 @@ public class UIMaze : UIBaseBehavior
     public void OnClickQuitButton()
     {
         GameManager.QuitGame();
+    }
+
+    private void EnableCursor()
+    {
+        Cursor.visible = true;
+        // Cursor.lockState = CursorLockMode.Confined;
+    }
+
+    private void DisableCursor()
+    {
+        Cursor.visible = false;
+        // Cursor.lockState = CursorLockMode.None;
     }
 
     private void DeactivatePlayButtonAndInfoBox()

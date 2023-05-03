@@ -221,7 +221,8 @@ public class Maze : MonoBehaviour
                             newWall = _highPolyWall2;
                             break;
                         default:
-                            Debug.Log("Randomizer for high poly walls doesn't work");
+                            //Debug.Log("Randomizer for high poly walls doesn't work");
+                            throw new RandomizerNumberIsTooHighException("Random Number is to high: Random number for choosing a high-poly wall exceeds the options for them");
                             break;
                     }
 
@@ -271,7 +272,7 @@ public class Maze : MonoBehaviour
                         newPillar = _highPolyPillar3;
                         break;
                     default:
-                        Debug.Log("Randomizer for the Pillars doesn't work");
+                        throw new RandomizerNumberIsTooHighException("Random Number is to high: Random number for choosing a high-poly pillar exceeds the options for them");
                         break;
                 }
 
@@ -445,13 +446,34 @@ public class Maze : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Could not instantiate newGameObject");
+                    throw new CantInstantiateObjectException("Failed to instantiate GameObject: The new maze unit gameobject had the wrong parameters for instantiation.");
                 }
             }
             else
             {
-                Debug.Log("Cannot find wall to remove in the last maze unit");
+                throw new CantDestroyObjectException("Failed to destroy GameObject: Cannot find a wall to remove in the last maze tile.");
             }
         }
     }
+}
+
+public class RandomizerNumberIsTooHighException : Exception
+{
+    public RandomizerNumberIsTooHighException() : base() { }
+    public RandomizerNumberIsTooHighException(string message) : base(message) { }
+    public RandomizerNumberIsTooHighException(string message, Exception inner) : base(message, inner) { }
+}
+
+public class CantInstantiateObjectException : Exception
+{
+    public CantInstantiateObjectException() : base() { }
+    public CantInstantiateObjectException(string message) : base(message) { }
+    public CantInstantiateObjectException(string message, Exception inner) : base(message, inner) { }
+}
+
+public class CantDestroyObjectException : Exception
+{
+    public CantDestroyObjectException() : base() { }
+    public CantDestroyObjectException(string message) : base(message) { }
+    public CantDestroyObjectException(string message, Exception inner) : base(message, inner) { }
 }

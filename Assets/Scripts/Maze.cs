@@ -221,9 +221,8 @@ public class Maze : MonoBehaviour
                             newWall = _highPolyWall2;
                             break;
                         default:
-                            //Debug.Log("Randomizer for high poly walls doesn't work");
                             throw new RandomizerNumberIsTooHighException("Random Number is to high: Random number for choosing a high-poly wall exceeds the options for them");
-                            break;
+                            //break;
                     }
 
                     // create a new rotation based on the orientation of the original wall  
@@ -273,7 +272,7 @@ public class Maze : MonoBehaviour
                         break;
                     default:
                         throw new RandomizerNumberIsTooHighException("Random Number is to high: Random number for choosing a high-poly pillar exceeds the options for them");
-                        break;
+                        //break;
                 }
 
                 // create the pillar

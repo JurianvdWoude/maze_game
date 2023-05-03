@@ -102,9 +102,14 @@ public class Maze : MonoBehaviour
 
     void ActivateGoal()
     {
+        // getting the x and y of the most upper-right tile, without taking into account
+        // the tilesize. this allows us to take into account if the tiles are too large 
+        // to all fit in the maze
+        // (so when mazeLength/mazeUnitlength is not a whole number for instance)
         int xPosition = Convert.ToInt32((_mazeWidth - _mazeUnitWidth) / _mazeUnitWidth);
         int yPosition = Convert.ToInt32((_mazeHeight - _mazeUnitHeight) / _mazeUnitHeight);
         _goal.transform.position = new Vector3(xPosition * _mazeUnitWidth, 0.5f, yPosition * _mazeUnitHeight);
+        // make sure that the goal is active 
         _goal.SetActive(true);
     }
 
@@ -118,8 +123,11 @@ public class Maze : MonoBehaviour
 
     void SetCameraMode()
     {
+        // set the player's position to the center of the bottom left tile
         _player.transform.position = new Vector3(0, 0.5f, 0);
+        // toggle the player's active flag
         _player.SetActive(!_player.activeSelf);
+        // toggle the camera's active flag
         _mainCamera.SetActive(!_mainCamera.activeSelf);
     }
 
@@ -203,14 +211,20 @@ public class Maze : MonoBehaviour
                     GameObject newWall = null;
                     // get a random mesh for the new wall of the maze tile 
                     int randomNumber = (int)UnityEngine.Random.Range(0, 2);
-                    if (randomNumber == 0)
+
+                    switch(randomNumber)
                     {
-                        newWall = _highPolyWall1;
+                        case 0:
+                            newWall = _highPolyWall1;
+                            break;
+                        case 1:
+                            newWall = _highPolyWall2;
+                            break;
+                        default:
+                            Debug.Log("Randomizer for high poly walls doesn't work");
+                            break;
                     }
-                    else
-                    {
-                        newWall = _highPolyWall2;
-                    }
+
                     // create a new rotation based on the orientation of the original wall  
                     Vector3 rotation = new Vector3(0, 0, 0);
                     // make sure that vertical facing walls are positioned that way
@@ -245,18 +259,22 @@ public class Maze : MonoBehaviour
                 // pick a random value for the pillar
                 int randomNumber = (int)UnityEngine.Random.Range(0, 3);
                 
-                if (randomNumber == 0)
+                switch(randomNumber)
                 {
-                    newPillar = _highPolyPillar1;
+                    case 0:
+                        newPillar = _highPolyPillar1;
+                        break;
+                    case 1:
+                        newPillar = _highPolyPillar2;
+                        break;
+                    case 2:
+                        newPillar = _highPolyPillar3;
+                        break;
+                    default:
+                        Debug.Log("Randomizer for the Pillars doesn't work");
+                        break;
                 }
-                else if (randomNumber == 1)
-                {
-                    newPillar = _highPolyPillar2;
-                }
-                else
-                {
-                    newPillar = _highPolyPillar3;
-                }
+
                 // create the pillar
                 Instantiate(newPillar, new Vector3((x - 0.5f) * _mazeUnitWidth, 0.375f, (z - 0.5f) * _mazeUnitHeight), Quaternion.Euler(new Vector3(90, 0, 0)));
 

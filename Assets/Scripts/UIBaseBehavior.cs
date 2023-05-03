@@ -1,58 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
 using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+public abstract class UIBaseBehavior : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _mazeUnitSizeInput;
-    [SerializeField]
-    private GameObject _mazeUnitSizeSlider;
-    [SerializeField]
-    private GameObject _mazeWidthInput;
-    [SerializeField]
-    private GameObject _mazeWidthSlider;
-    [SerializeField]
-    private GameObject _mazeHeightInput;
-    [SerializeField]
-    private GameObject _mazeHeightSlider;
-
-    public void LoadGame()
+    protected void SliderBehavior
+    (
+        GameObject _mazeHeightInput,
+        GameObject _mazeWidthInput,
+        GameObject _mazeUnitSizeInput,
+        GameObject _mazeHeightSlider,
+        GameObject _mazeWidthSlider,
+        GameObject _mazeUnitSizeSlider
+    )
     {
-        SceneManager.LoadScene(1);
-    }
-
-    private void Update()
-    {
+        // Get the Input Field for the size of the maze's tiles
         TMPro.TMP_InputField mazeUnitInputField = _mazeUnitSizeInput.gameObject.GetComponent<TMPro.TMP_InputField>();
+        // Get the Slider for the size of the maze's tiles
         Slider mazeUnitSliderField = _mazeUnitSizeSlider.gameObject.GetComponent<Slider>();
-        if 
+        // if there's input and it's a number and it is different from what's stored in the Gamemanager
+        if
         (
-            mazeUnitInputField.text != null && 
-            int.TryParse(mazeUnitInputField.text, out _) && 
+            mazeUnitInputField.text != null &&
+            int.TryParse(mazeUnitInputField.text, out _) &&
             mazeUnitInputField.text != GameManager.mazeUnitSize.ToString()
         )
         {
+            // Set the stored maze tile size to the one in the Input Field
             GameManager.mazeUnitSize = float.Parse(mazeUnitInputField.text);
+            // Set the Slider value equal to the value in the Input Field
             mazeUnitSliderField.value = GameManager.mazeUnitSize;
         }
-        else if (mazeUnitSliderField != null )
+        // otherwise, if the Slider's used instead of the input field
+        else if (mazeUnitSliderField != null)
         {
+            // Set the stored maze tile size to the one in the Slider
             GameManager.mazeUnitSize = mazeUnitSliderField.value;
+            // Set the Input Field value equal to the value in the Slider
             mazeUnitInputField.text = GameManager.mazeUnitSize.ToString();
-        } 
-        
+        }
         else
         {
+            // If Neither the Input Field or Slider are used, set the store tile size to 1
             GameManager.mazeUnitSize = 1f;
+            // Then set the Slider's value equal to 1
             mazeUnitSliderField.value = GameManager.mazeUnitSize;
+            // And the Input Field equal to 1
             mazeUnitInputField.text = GameManager.mazeUnitSize.ToString();
         }
 
-
+        // Similar as above, but with the Maze Width Slider and Input Field
         TMPro.TMP_InputField mazeWidthInputField = _mazeWidthInput.gameObject.GetComponent<TMPro.TMP_InputField>();
         Slider mazeWidthSliderField = _mazeWidthSlider.gameObject.GetComponent<Slider>();
         if
@@ -78,7 +76,7 @@ public class MainMenu : MonoBehaviour
             mazeWidthInputField.text = GameManager.mazeWidth.ToString();
         }
 
-
+        // Similar as above, but with the Maze Height Slider and Input Field
         TMPro.TMP_InputField mazeHeightInputField = _mazeHeightInput.gameObject.GetComponent<TMPro.TMP_InputField>();
         Slider mazeHeightSliderField = _mazeHeightSlider.gameObject.GetComponent<Slider>();
         if

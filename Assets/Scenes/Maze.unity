@@ -2164,7 +2164,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &973018186
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2232,7 +2232,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 869363220}
         m_TargetAssemblyTypeName: UI, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: OnClickStartButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2882,7 +2882,7 @@ GameObject:
   - component: {fileID: 1216909148}
   - component: {fileID: 1216909147}
   m_Layer: 5
-  m_Name: Corridor Size Info
+  m_Name: Maze Tile Size Info
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2928,7 +2928,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Corridor Size: 0 x 0'
+  m_text: 'Maze Tile Size: 0 x 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3091,7 +3091,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 869363220}
         m_TargetAssemblyTypeName: UI, Assembly-CSharp
-        m_MethodName: RestartGame
+        m_MethodName: OnClickRestartButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3344,9 +3344,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 751950541}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+      - m_Target: {fileID: 869363220}
+        m_TargetAssemblyTypeName: UI, Assembly-CSharp
+        m_MethodName: OnClickQuitButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4152,7 +4152,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1608557191
 Transform:
   m_ObjectHideFlags: 0
@@ -4468,7 +4468,7 @@ MonoBehaviour:
   _highPolyPillar3: {fileID: 4034851996184267260, guid: 08af444baf4e5604db5afe604b348ca9, type: 3}
   _goal: {fileID: 1191061956}
   _mainCamera: {fileID: 972717508}
-  _playerCamera: {fileID: 1608557190}
+  _player: {fileID: 1608557190}
   _mazeWidth: 0
   _mazeHeight: 0
   _mazeUnitHeight: 1
